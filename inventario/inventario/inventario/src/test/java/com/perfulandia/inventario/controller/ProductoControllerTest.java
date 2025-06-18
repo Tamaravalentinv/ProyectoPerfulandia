@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Arrays;
@@ -28,14 +30,17 @@ public class ProductoControllerTest {
     }
 
     @Test
-    void listar_deberiaRetornarListaDeProductos() {
-        List<Producto> productos = Arrays.asList(new Producto(), new Producto());
-        when(productoService.listar()).thenReturn(productos);
+void listar_deberiaRetornarListaDeProductos() {
+    List<Producto> productos = Arrays.asList(new Producto(), new Producto());
+    when(productoService.listar()).thenReturn(productos);
 
-        List<Producto> resultado = productoController.listar();
+    ResponseEntity<CollectionModel<EntityModel<Producto>>> respuesta = productoController.listar();
 
-        assertThat(resultado).hasSize(2);
-    }
+    assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
+    assertThat(respuesta.getBody()).isNotNull();
+    assertThat(respuesta.getBody().getContent()).hasSize(2);
+}
+
 
     @Test
     void guardar_deberiaRetornarRespuestaCreado() {
@@ -47,15 +52,17 @@ public class ProductoControllerTest {
     }
 
     @Test
-    void obtener_deberiaRetornarProductoSiExiste() {
-        Producto producto = new Producto();
-        when(productoService.obtenerPorId(1L)).thenReturn(Optional.of(producto));
+void obtener_deberiaRetornarProductoSiExiste() {
+    Producto producto = new Producto();
+    when(productoService.obtenerPorId(1L)).thenReturn(Optional.of(producto));
 
-        ResponseEntity<Producto> respuesta = productoController.obtener(1L);
+    ResponseEntity<EntityModel<Producto>> respuesta = productoController.obtener(1L);
 
-        assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
-        assertThat(respuesta.getBody()).isEqualTo(producto);
-    }
+    assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
+    assertThat(respuesta.getBody()).isNotNull();
+    assertThat(respuesta.getBody().getContent()).isEqualTo(producto);
+}
+
 
     @Test
     void eliminar_deberiaRetornarOkSiEliminado() {
