@@ -17,19 +17,19 @@ public class PedidoService {
         return pedidoRepository.findAll();
     }
 
-    public Pedido savePedido(Pedido pedido) {
-        return pedidoRepository.save(pedido);
+    public Pedido getPedidoId(Integer id) {
+        return pedidoRepository.findById(id).orElse(null);
     }
 
-    public Pedido getPedidoId(int id) {
-        return pedidoRepository.findById(id).orElse(null);
+    public Pedido savePedido(Pedido pedido) {
+        return pedidoRepository.save(pedido);
     }
 
     public Pedido updatePedido(Pedido pedido) {
         return pedidoRepository.save(pedido);
     }
 
-    public void deletePedido(int id) {
+    public void deletePedido(Integer id) {
         pedidoRepository.deleteById(id);
     }
 }

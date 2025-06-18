@@ -2,11 +2,15 @@ package com.perfulandia.pedidos.controller;
 
 import com.perfulandia.pedidos.model.Pedido;
 import com.perfulandia.pedidos.service.PedidoService;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -24,7 +28,7 @@ public class PedidoControllerTest {
     private PedidoService pedidoService;
 
     @InjectMocks
-    private PedidoController pedidoController;  // Importa correctamente y se inyecta
+    private PedidoController pedidoController;
 
     @BeforeEach
     public void setUp() {
@@ -36,42 +40,52 @@ public class PedidoControllerTest {
         List<Pedido> listaPedidos = Arrays.asList(new Pedido(), new Pedido());
         when(pedidoService.getPedidos()).thenReturn(listaPedidos);
 
-        ResponseEntity<List<Pedido>> response = pedidoController.listarPedidos();
+        ResponseEntity<CollectionModel<EntityModel<Pedido>>> response = pedidoController.listarPedidos();
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).hasSize(2);
+
+        CollectionModel<EntityModel<Pedido>> body = response.getBody();
+        assertThat(body).isNotNull();
+        assertThat(body.getContent()).hasSize(2);
+
         verify(pedidoService).getPedidos();
     }
 
     @Test
     void agregarPedido_deberiaRetornarRespuestaCreada() {
-    Pedido pedido = new Pedido();
-    when(pedidoService.savePedido(any(Pedido.class))).thenReturn(pedido);
+        Pedido pedido = new Pedido();
+        when(pedidoService.savePedido(any(Pedido.class))).thenReturn(pedido);
 
-    ResponseEntity<String> response = pedidoController.agregarPedido(pedido);
+        ResponseEntity<String> response = pedidoController.agregarPedido(pedido);
 
-    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-    assertThat(response.getBody()).isEqualTo("Pedido creado");
-    verify(pedidoService).savePedido(pedido);
-}
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(response.getBody()).isEqualTo("Pedido creado");
+        verify(pedidoService).savePedido(pedido);
+    }
 
     @Test
     void obtenerPedidoPorId_deberiaRetornarPedidoSiExiste() {
-        Pedido pedido = new Pedido();
-        when(pedidoService.getPedidoId(1)).thenReturn(pedido);
+    Pedido pedido = new Pedido();
+    pedido.setId(1);
+    pedido.setNombre("Prueba");
+    pedido.setValor(100);
 
-        ResponseEntity<Pedido> response = pedidoController.obtenerPedidoPorId(1);
+    when(pedidoService.getPedidoId(1)).thenReturn(pedido);
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(pedido);
-        verify(pedidoService).getPedidoId(1);
+    ResponseEntity<EntityModel<Pedido>> response = pedidoController.obtenerPedidoPorId(1);
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(response.getBody()).isNotNull();
+    assertThat(response.getBody().getContent()).isEqualTo(pedido);
+
+    verify(pedidoService).getPedidoId(1);
     }
 
     @Test
     void obtenerPedidoPorId_deberiaRetornarNotFoundSiNoExiste() {
         when(pedidoService.getPedidoId(999)).thenReturn(null);
 
-        ResponseEntity<Pedido> response = pedidoController.obtenerPedidoPorId(999);
+        ResponseEntity<EntityModel<Pedido>> response = pedidoController.obtenerPedidoPorId(999);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         verify(pedidoService).getPedidoId(999);
@@ -84,10 +98,12 @@ public class PedidoControllerTest {
         when(pedidoService.getPedidoId(1)).thenReturn(pedidoExistente);
         when(pedidoService.updatePedido(any(Pedido.class))).thenReturn(pedidoActualizado);
 
-        ResponseEntity<Pedido> response = pedidoController.actualizarPedido(1, pedidoActualizado);
+        ResponseEntity<EntityModel<Pedido>> response = pedidoController.actualizarPedido(1, pedidoActualizado);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(pedidoActualizado);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getContent()).isEqualTo(pedidoActualizado);
+
         verify(pedidoService).getPedidoId(1);
         verify(pedidoService).updatePedido(any(Pedido.class));
     }
@@ -96,7 +112,7 @@ public class PedidoControllerTest {
     void actualizarPedido_deberiaRetornarNotFoundSiNoExiste() {
         when(pedidoService.getPedidoId(2)).thenReturn(null);
 
-        ResponseEntity<Pedido> response = pedidoController.actualizarPedido(2, new Pedido());
+        ResponseEntity<EntityModel<Pedido>> response = pedidoController.actualizarPedido(2, new Pedido());
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         verify(pedidoService).getPedidoId(2);
