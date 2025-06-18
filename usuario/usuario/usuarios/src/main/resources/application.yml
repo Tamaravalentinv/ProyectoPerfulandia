@@ -15,11 +15,5 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
 
-  security:
-    user:
-      name: admin
-      password: admin
-      roles: ADMIN
-
 server:
   port: 8083

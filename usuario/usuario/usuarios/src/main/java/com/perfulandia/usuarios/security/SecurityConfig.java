@@ -12,12 +12,21 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(AbstractHttpConfigurer::disable)  // deshabilitar CSRF para simplificar pruebas
+            .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/usuarios/register", "/api/usuarios/login").permitAll()  // permisos públicos
-                .anyRequest().authenticated()  // el resto necesita autenticación
+                .requestMatchers(
+                    "/api/usuarios/register",
+                    "/api/usuarios/login",
+                    
+                    // 🔓 Swagger sin autenticación
+                    "/swagger-ui/**",
+                    "/v3/api-docs/**",
+                    "/swagger-resources/**",
+                    "/webjars/**"
+                ).permitAll()
+                .anyRequest().authenticated()
             )
-            .httpBasic(httpBasic -> {}); // usar basic auth, aunque luego podrías cambiar a JWT en filtros
+            .httpBasic(httpBasic -> {});
         return http.build();
     }
 }
