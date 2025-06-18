@@ -1,20 +1,30 @@
 package com.perfulandia.ventas.entity;
 
-import jakarta.persistence.*;
+import org.springframework.hateoas.RepresentationModel;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Table;
+
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "ventas")
-public class Venta {
+public class Venta extends RepresentationModel<Venta> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     private String cliente;
+
     private LocalDate fecha;
+
     private int total;
-    private String producto; // Nuevo campo para el producto comprado
+
+    private String producto;
 
     // Getters y Setters
     public Integer getId() {

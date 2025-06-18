@@ -23,24 +23,23 @@ public class VentaControllerTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        MockitoAnnotations.openMocks(this); // Inicializa los mocks
     }
 
     @Test
     void registrarVenta_deberiaRetornarMensajeCorrecto() {
+        // Preparar
         Venta venta = new Venta();
         venta.setProducto("Perfume XYZ");
 
-        // No mocks necesarios para método void guardarVenta
-
-        // Ejecutar el método
+        // Ejecutar
         ResponseEntity<String> response = ventaController.registrarVenta(venta);
 
-        // Validar la respuesta
+        // Verificar estado y contenido
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(response.getBody()).isEqualTo("Venta creada. Producto comprado: Perfume XYZ");
 
-        // Verificar que guardarVenta fue llamado con la venta
+        // Verificar llamada al servicio
         verify(ventaService).guardarVenta(venta);
     }
 }

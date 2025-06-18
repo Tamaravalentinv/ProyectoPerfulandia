@@ -20,7 +20,7 @@ public class VentaService {
         return ventaRepository.findAll();
     }
 
-    public Optional<Venta> obtenerVentaPorId(Long id) {
+    public Optional<Venta> obtenerVentaPorId(Integer id) {
         return ventaRepository.findById(id);
     }
 
@@ -28,7 +28,7 @@ public class VentaService {
         return ventaRepository.save(venta);
     }
 
-    public void eliminarVenta(Long id) {
+    public void eliminarVenta(Integer id) {
         ventaRepository.deleteById(id);
     }
 }
